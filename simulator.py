@@ -372,6 +372,7 @@ class CROSS(object):
         self.update = False
     # main functions
     def step(self):
+        self.update=False
         for roadId in self.validRoad:
             ROADDICT[roadId].setBucket(self.id_)
         # data preapre
