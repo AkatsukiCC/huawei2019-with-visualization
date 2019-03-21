@@ -38,7 +38,8 @@ time：11 [10010,10004,10005,10006,10007]
 python3 simulator.py ../config_11/car.txt ../config_11/road.txt ../config_11/cross.txt ../config_11/answer.txt
 
 (4)可视化部分
-class visualization 为可视化模块，输出图片位置在visualization.savePath。
+请取消visualize.drawMap()的注释以启用可视化。
+class visualization 为可视化模块，输出图片所在文件夹记录在visualization.savePath，为所有时刻的车辆状况图片。
 class simulation 中有调用visualization。可注释simulation.simulate()中的 visualize.drawMap()以提高程序运行速度。
 
 #**** 发现问题的记得联系我 ****#
