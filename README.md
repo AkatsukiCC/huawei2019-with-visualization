@@ -42,5 +42,8 @@ python3 simulator.py ../config_11/car.txt ../config_11/road.txt ../config_11/cro
 class visualization 为可视化模块，输出图片所在文件夹记录在visualization.savePath，为所有时刻的车辆状况图片。
 class simulation 中有调用visualization。可注释simulation.simulate()中的 visualize.drawMap()以提高程序运行速度。
 
+(5)图片信息详细介绍
+参考   "介绍图片.png"
+
 #**** 发现问题的记得联系我 ****#
 qq:2938830818
