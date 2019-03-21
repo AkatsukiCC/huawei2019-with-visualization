@@ -369,6 +369,7 @@ class CROSS(object):
         self.finishCarNum = 0
         # **** flag ****#
         self.done = False
+        self.update = False
     # main functions
     def step(self):
         for roadId in self.validRoad:
@@ -392,19 +393,17 @@ class CROSS(object):
                 nextCarPriority.append(-1)
         # loop
         for provideIndex in range(self.provider.__len__()):
-            conflict = False
             while nextCar[provideIndex]!=-1:
                 # same next road and high priority lead to conflict
                 provider = ROADDICT[self.provider[provideIndex]]
                 for i in range(self.provider.__len__()):
+                    # if conflict(same direction and low priority)
                     if nextRoad[i]==nextRoad[provideIndex] and nextCarPriority[i]>nextCarPriority[provideIndex]:
-                        conflict = True
                         break
-                if conflict:
-                    break
                 #
                 if nextRoad[provideIndex] == -1:
                     provider.firstPriorityCarAct(0)
+                    self.update = True
                     CARDISTRIBUTION[1]-=1
                     CARDISTRIBUTION[2]+=1
                 else:
@@ -413,6 +412,7 @@ class CROSS(object):
                     if action == 2:
                         break
                     provider.firstPriorityCarAct(action)
+                    self.update = True
                 nextCarId[provideIndex] = provider.firstPriorityCar()
                 if nextCarId[provideIndex] != -1:
                     nextCar[provideIndex] = CARDICT[nextCarId[provideIndex]]
@@ -539,14 +539,19 @@ class simulation(object):
         for road in ROADNAMESPACE:
             ROADDICT[road].stepInit()
         print("while loop...")
-        crossDone = 0
-        while crossDone < CROSSNAMESPACE.__len__():
-            for crossId in CROSSNAMESPACE:
+        unfinishedCross = CROSSNAMESPACE
+        while unfinishedCross.__len__() > 0:
+            self.dead = True
+            nextCross = []
+            for crossId in unfinishedCross:
                 cross = CROSSDICT[crossId]
+                cross.step()
                 if not cross.__done__():
-                    cross.step()
-                    if cross.__done__():
-                        crossDone += 1
+                    nextCross.append(crossId)
+                if cross.__update__() or cross.__done__():
+                    self.dead = False
+            unfinishedCross = nextCross
+            assert self.dead is False, print("dead lock in", unfinishedCross)
         print("car pulling away from carport")
         for i in range(CROSSNAMESPACE.__len__()):
             crossId = CROSSNAMESPACE[i]
