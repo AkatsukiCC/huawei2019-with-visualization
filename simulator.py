@@ -520,6 +520,8 @@ class CROSS(object):
         return self.carportCarNum
     def __finishCarNum__(self):
         return self.finishCarNum
+    def __update__(self):
+        return self.update
     #
     # show some important info
     #
