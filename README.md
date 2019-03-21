@@ -43,7 +43,7 @@ class visualization 为可视化模块，输出图片所在文件夹记录在vis
 class simulation 中有调用visualization。可注释simulation.simulate()中的 visualize.drawMap()以提高程序运行速度。
 
 (5)图片信息详细介绍
-参考   "介绍图片.png"
+参考   "介绍图片.rar"
 
 #**** 发现问题的记得联系我 ****#
 qq:2938830818
