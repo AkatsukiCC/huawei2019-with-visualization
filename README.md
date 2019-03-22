@@ -7,7 +7,7 @@
 
 (2)step 2:伪代码如下(为了方便阅读，写成易理解的行驶，主要演示调度规则。我的实现做了一些处理，方便写成代码)
 
-time==0
+time==0    
 while allCarDone == False:  
     while allCrossDone == False :  
         for cross in allCross(升序):  
@@ -72,28 +72,28 @@ time：11 [10010,10004,10005,10006,10007]
 (1)路径为官方SDK路径，代码存放与src目录下（与CodeCraft-2019.py 同目录）
 
 (2)
-除answer.txt以外均为原始文件，不要更改（我并未做注释处理）
-answer.txt格式为提交答案格式，但是注意不能有注释。
-错误样例：
-#xxxxx
-(carId,plantime,route)
-(carId,plantime,route)
-(carId,plantime,route)
-正例:
-(carId,plantime,route)
-(carId,plantime,route)
-(carId,plantime,route)
+除answer.txt以外均为原始文件，不要更改（我并未做注释处理）   
+answer.txt格式为提交答案格式，但是注意不能有注释。    
+错误样例：   
+#xxxxx   
+(carId,plantime,route)   
+(carId,plantime,route)    
+(carId,plantime,route)    
+正例:    
+(carId,plantime,route)   
+(carId,plantime,route)   
+(carId,plantime,route)   
 
 (3)运行
 python3 simulator.py ../config_11/car.txt ../config_11/road.txt ../config_11/cross.txt ../config_11/answer.txt
 
 (4)可视化部分
-请取消visualize.drawMap()的注释以启用可视化。
-class visualization 为可视化模块，输出图片所在文件夹记录在visualization.savePath，为所有时刻的车辆状况图片。
-class simulation 中有调用visualization。可注释simulation.simulate()中的 visualize.drawMap()以提高程序运行速度。
+请取消visualize.drawMap()的注释以启用可视化。     
+class visualization 为可视化模块，输出图片所在文件夹记录在visualization.savePath，为所有时刻的车辆状况图片。    
+class simulation 中有调用visualization。可注释simulation.simulate()中的 visualize.drawMap()以提高程序运行速度。    
 
-(5)图片信息详细介绍
+(5)图片信息详细介绍    
 参考   "介绍图片.rar"
 
-#**** 发现问题的记得联系我 ****#
+#**** 发现问题的记得联系我 ****#     
 qq:2938830818
