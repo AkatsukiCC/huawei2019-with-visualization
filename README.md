@@ -43,7 +43,8 @@ while allCarDone == False:
 	time+=1  
 
 
-conflict判断：
+conflict判断：   
+（除了前方道路车辆出于等待状态以外）
 
 0，1，2，3 分别表示 北东南西  
 -1，1，2 分别表示右，左，直  
