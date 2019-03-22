@@ -4,13 +4,15 @@
 
 
 #**** 更新 ****#
+2019/3/22  
+添加了到终点车辆
 
-2019/3/21
-加入锁死判据：
+2019/3/21  
+加入锁死判据：  
     在一个cross循环中，若所有cross都未更新，即锁死。cross循环指按cross id 升序遍历所有cross的过程。（注：例外，当所有cross上所有道路都更新完毕时，再一次cross循环时，所有cross是不会更新的，如起始状态。）
 
-2019/3/20 
-原代码中，车辆到达设计出发时间无法上路会导致报错。新代码做了更改，未上路的车加入下一时刻判断。
+2019/3/20    
+原代码中，车辆到达设计出发时间无法上路会导致报错。新代码做了更改，未上路的车加入下一时刻判断。  
 ps:官方并未说明这里如何实现。我的原则如下例子所示：
              按照从左到右依次上路
 time:10 [10001,10002,10003,10010] 10010未能上路
@@ -26,17 +28,17 @@ time：11 [10010,10004,10005,10006,10007]
 
 (2)step 2:伪代码如下(为了方便阅读，写成易理解的行驶，主要演示调度规则。我的实现做了一些处理，方便写成代码)
 
-time==0    
-while allCarDone == False:  
-    while allCrossDone == False :  
-        for cross in allCross(升序):  
-            for road in crossRoad(升序，仅考虑在当前cross下作为出口的road):  
-                car = road.getFirstPriorityCar()(仅为可能出道路的车)  
-                if conflict:  
-                    break  
-                car.run()  
-                road.run(car.channel)（一旦car到达完毕状态，road中car所在车道做一次”道内移动“）  
-   time+=1  
+time==0     
+while allCarDone == False:   
+    while allCrossDone == False :   
+		for cross in allCross(升序):   
+			for road in crossRoad(升序，仅考虑在当前cross下作为出口的road):   
+				car = road.getFirstPriorityCar()(仅为可能出道路的车)   
+					if conflict:  
+					break  
+				car.run()  
+				road.run(car.channel)（一旦car到达完毕状态，road中car所在车道做一次”道内移动“）  	
+	time+=1  
 
 
 conflict判断：
