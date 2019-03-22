@@ -41,13 +41,18 @@ conflict判断：
 判断依据只看车辆的 ”***出道路和行驶方向***“，与是否到达终点无关（到终点行驶方向作直行）。（来自于小原解答https://bbs.huaweicloud.com/forum/thread-15362-1-1.html）
 
 carA，roadA，dirA  carB,roadB,dirB
+
 if(roadA+dirA)%4 == (roadB+dirB)%4 and dirA<dirB:
+
     return conflict
+    
 else:
+
     return not conflict
 
 exp:
-A,3,-1  B,0,2 (3-1)%4==(0+2) and -1<2
+A,3,-1  B,0,2 
+(3-1)%4==(0+2) and -1<2     
 A的优先级小于B
 
 
