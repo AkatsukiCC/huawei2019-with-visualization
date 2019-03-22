@@ -8,50 +8,38 @@
 (2)step 2:伪代码如下(为了方便阅读，写成易理解的行驶，主要演示调度规则。我的实现做了一些处理，方便写成代码)
 
 time==0
-while allCarDone == False:
-
-    while allCrossDone == False :
-    
-        for cross in allCross(升序):
-        
-            for road in crossRoad(升序，仅考虑在当前cross下作为出口的road):
-            
-                car = road.getFirstPriorityCar()(仅为可能出道路的车)
-                
-                if conflict:
-                
-                    break
-                    
-                car.run()
-                
-                road.run(car.channel)（一旦car到达完毕状态，road中car所在车道做一次”道内移动“）
-                
-   time+=1
+while allCarDone == False:  
+    while allCrossDone == False :  
+        for cross in allCross(升序):  
+            for road in crossRoad(升序，仅考虑在当前cross下作为出口的road):  
+                car = road.getFirstPriorityCar()(仅为可能出道路的车)  
+                if conflict:  
+                    break  
+                car.run()  
+                road.run(car.channel)（一旦car到达完毕状态，road中car所在车道做一次”道内移动“）  
+   time+=1  
 
 
 conflict判断：
 
-0，1，2，3 分别表示 北东南西
--1，1，2 分别表示右，左，直
-#*           0(5004)
-#*   3(5001)         1(5003)
-#*           2(5002)
+0，1，2，3 分别表示 北东南西  
+-1，1，2 分别表示右，左，直  
+#*           0(5004)  
+#*   3(5001)         1(5003)  
+#*           2(5002)  
 
 
 判断依据只看车辆的 ”***出道路和行驶方向***“，与是否到达终点无关（到终点行驶方向作直行）。（来自于小原解答https://bbs.huaweicloud.com/forum/thread-15362-1-1.html）
 
 carA，roadA，dirA  carB,roadB,dirB
 
-if(roadA+dirA)%4 == (roadB+dirB)%4 and dirA<dirB:
-
-    return conflict
-    
-else:
-
-    return not conflict
+if(roadA+dirA)%4 == (roadB+dirB)%4 and dirA<dirB:  
+    return conflict   
+else:    
+    return not conflict  
 
 exp:
-A,3,-1  B,0,2 
+A,3,-1  B,0,2   
 (3-1)%4==(0+2) and -1<2     
 A的优先级小于B
 
