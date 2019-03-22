@@ -26,18 +26,20 @@ time：11 [10010,10004,10005,10006,10007]
 
 (1) step 1:车道内车辆状态更新为等待状态。车道内车辆有道路出口向道路末尾依次判断车是否能运行（”道内移动“），若能运行则标记为完毕状态。（当且仅当车辆不会出路口，前前方阻拦车辆为完毕状态或无阻拦时才可运行） 
 
-(2)step 2:伪代码如下(为了方便阅读，写成易理解的行驶，主要演示调度规则。我的实现做了一些处理，方便写成代码)
-
+(2)step 2:伪代码如下(为了方便阅读，写成易理解的行驶，主要演示调度规则。我的实现做了一些处理，方便写成代码)      
 time==0     
 while allCarDone == False:   
     while allCrossDone == False :   
-		for cross in allCross(升序):   
+		for cross in allCross(升序):
+			firstPriorityCars = []    
+			for road in crossRoad:    
+				firstPriorityCars.append(road.getFirstPriorityCar())    
 			for road in crossRoad(升序，仅考虑在当前cross下作为出口的road):   
-				car = road.getFirstPriorityCar()(仅为可能出道路的车)   
-					if conflict:  
+				car = road.getFirstPriorityCar()(仅为可能出道路的车)    
+				if conflict(road,car,firstPriorityCars):    
 					break  
 				car.run()  
-				road.run(car.channel)（一旦car到达完毕状态，road中car所在车道做一次”道内移动“）  	
+				road.run(car.channel)（一旦car到达完毕状态，road中car所在车道做一次”道内移动“）  	    
 	time+=1  
 
 
