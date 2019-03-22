@@ -2,7 +2,7 @@
 import sys
 import numpy as np
 import cv2 as cv
-import copy
+
 np.random.seed(951105)
 
 
@@ -11,14 +11,14 @@ TIME = [0]
 CARDISTRIBUTION = [0,0,0]
 CARNAMESPACE,ROADNAMESPACE,CROSSNAMESPACE = [],[],[]
 CROSSDICT,CARDICT,ROADDICT ={},{},{}
-ROUTEMAP ={}
+
 
 
 
 class CAR(object):
     def __init__(self,id_,from_,to_,speed_,planTime_):
         # **** statistic parameters ****#
-        self.id_, self.from_, self.to_, self.speed_, self.planTime_ = id_, from_, to_, speed_, planTime_
+        self.id_, self.from_, self.to_, self.speed_, self.planTime_ = id_, from_, to_, speed_, -1
         self.carColor = [int(value) for value in np.random.random_integers(0, 255, [3])]
         # **** dynamic parameters ****#
         self.state,self.x,self.y = 0,0,0
@@ -245,9 +245,9 @@ class ROAD(object):
         if self.receiveBucket is None:
             print("Please do CAR.setBucket() first!")
         car = CARDICT[carId]
-        leftX = max(min(self.speed_, car.__speed__()) - car.__x__(), 0)
+        leftX = min(self.speed_, car.__speed__()) - car.__x__()
         nextCrossId = self.from_ if car.__nextCrossId__() != self.from_ else self.to_
-        if leftX == 0:
+        if leftX <= 0:
             car.updateDynamic(state=2,x=0)
             return 1
         #find front car
@@ -345,24 +345,26 @@ class CROSS(object):
         self.x, self.y = 0, 0
         self.mapX,self.mapY = 0,0
         # priorityMap
-        self.priorityMap = {north_: {east_: 1, south_: 2, west_: 0}, \
-                            east_: {south_: 1, west_: 2, north_: 0}, \
-                            south_: {west_: 1, north_: 2, east_: 0}, \
-                            west_: {north_: 1, east_: 2, south_: 0}}
+        self.directionMap = {north_: {east_: 1, south_: 2, west_: -1}, \
+                             east_: {south_: 1, west_: 2, north_: -1}, \
+                             south_: {west_: 1, north_: 2, east_: -1}, \
+                             west_: {north_: 1, east_: 2, south_: -1}}
         # relationship with roads
-        self.providerIndex, self.receiverIndex, self.validRoadIndex = [], [], []
+        self.providerDirection, self.receiverDirection, self.validRoadDirecction = [], [], []
         for index, roadId in enumerate(self.roadIds):
             road = ROADDICT[roadId] if roadId != -1 else None
             if road is not None and (road.__isDuplex__() or road.__to__() == self.id_):
-                self.providerIndex.append(index)
+                self.providerDirection.append(index)
             if road is not None and (road.__isDuplex__() or road.__from__() == self.id_):
-                self.receiverIndex.append(index)
+                self.receiverDirection.append(index)
             if road is not None:
-                self.validRoadIndex.append(index)
-        self.provider = [self.roadIds[index] for index in self.providerIndex]
-        self.receiver = [self.roadIds[index] for index in self.receiverIndex]
-        self.validRoad = [self.roadIds[index] for index in self.validRoadIndex]
-        self.provider.sort()
+                self.validRoadDirecction.append(index)
+        self.provider = [[direction, self.roadIds[direction]] for direction in self.providerDirection]
+        self.receiver = [self.roadIds[direction] for direction in self.receiverDirection]
+        self.validRoad = [self.roadIds[direction] for direction in self.validRoadDirecction]
+        self.provider.sort(key=takeSecond)
+        self.providerDirection = [self.provider[i][0] for i in range(self.provider.__len__())]
+        self.provider = [self.provider[i][1] for i in range(self.provider.__len__())]
         # **** dynamic parameters ****#
         self.readyCars = []
         self.carportCarNum = 0
@@ -372,64 +374,69 @@ class CROSS(object):
         self.update = False
     # main functions
     def step(self):
-        self.update=False
+        self.update = False
         for roadId in self.validRoad:
             ROADDICT[roadId].setBucket(self.id_)
         # data preapre
-        nextCarId,nextCar,nextRoad,nextCarPriority =[],[],[],[]
-        for provideIndex in range(self.provider.__len__()):
-            nextCarId.append(ROADDICT[self.provider[provideIndex]].firstPriorityCar())
+        nextCarId,nextCar,nextRoad,nextDirection =[],[],[],[]
+        #
+        # 0,1,2,3 denote north,east,south,west
+        #
+        for index in range(self.provider.__len__()):
+            nextCarId.append(ROADDICT[self.provider[index]].firstPriorityCar())
             # if first priority car exists
-            if nextCarId[provideIndex]!=-1:
-                nextCar.append(CARDICT[nextCarId[provideIndex]])
-                nextRoad.append(nextCar[provideIndex].__nextRoad__())
+            if nextCarId[index]!=-1:
+                nextCar.append(CARDICT[nextCarId[index]])
+                nextRoad.append(nextCar[index].__nextRoad__())
                 # nextRoad == -1 => terminal
-                if nextRoad[provideIndex]==-1:
-                    nextCarPriority.append(2)
+                if nextRoad[index]==-1:
+                    nextDirection.append(2)
                 else:
-                    nextCarPriority.append(self.prority(self.provider[provideIndex],nextRoad[provideIndex]))
+                    nextDirection.append(self.direction(self.provider[index],nextRoad[index]))
             else:
                 nextCar.append(-1)
                 nextRoad.append(-1)
-                nextCarPriority.append(-1)
+                nextDirection.append(-1)
         # loop
-        for provideIndex in range(self.provider.__len__()):
-            while nextCar[provideIndex]!=-1:
+        for presentRoadIndex in range(self.provider.__len__()):
+            while nextCar[presentRoadIndex]!=-1:
                 # same next road and high priority lead to conflict
-                provider = ROADDICT[self.provider[provideIndex]]
-                for i in range(self.provider.__len__()):
-                    # if conflict(same direction and low priority)
-                    if nextRoad[i]==nextRoad[provideIndex] and nextCarPriority[i]>nextCarPriority[provideIndex]:
+                provider = ROADDICT[self.provider[presentRoadIndex]]
+                for otherRoadIndex in range(self.provider.__len__()):
+                    # conflict
+                    # first priority car exists at road self.provider[otherRoadIndex]
+                    if nextCar[otherRoadIndex]!=-1 and \
+        self.isConflict(self.providerDirection[presentRoadIndex],nextDirection[presentRoadIndex],self.providerDirection[otherRoadIndex],nextDirection[otherRoadIndex]):
                         break
-                #
-                if nextRoad[provideIndex] == -1:
+                if nextRoad[presentRoadIndex] == -1:
                     provider.firstPriorityCarAct(0)
+                    CARDISTRIBUTION[1] -= 1
+                    CARDISTRIBUTION[2] += 1
+                    self.finishCarNum += 1
                     self.update = True
-                    CARDISTRIBUTION[1]-=1
-                    CARDISTRIBUTION[2]+=1
                 else:
-                    nextroad_ = ROADDICT[nextRoad[provideIndex]]
-                    action = nextroad_.receiveCar(nextCar[provideIndex].__id__())
+                    nextroad_ = ROADDICT[nextRoad[presentRoadIndex]]
+                    action = nextroad_.receiveCar(nextCar[presentRoadIndex].__id__())
                     if action == 2:
                         break
-                    provider.firstPriorityCarAct(action)
                     self.update = True
-                nextCarId[provideIndex] = provider.firstPriorityCar()
-                if nextCarId[provideIndex] != -1:
-                    nextCar[provideIndex] = CARDICT[nextCarId[provideIndex]]
-                    nextRoad[provideIndex] = nextCar[provideIndex].__nextRoad__()
+                    provider.firstPriorityCarAct(action)
+                nextCarId[presentRoadIndex] = provider.firstPriorityCar()
+                if nextCarId[presentRoadIndex] != -1:
+                    nextCar[presentRoadIndex] = CARDICT[nextCarId[presentRoadIndex]]
+                    nextRoad[presentRoadIndex] = nextCar[presentRoadIndex].__nextRoad__()
                     # nextRoad == -1 => terminal
-                    if nextRoad[provideIndex] == -1:
-                        nextCarPriority[provideIndex] = 2
+                    if nextRoad[presentRoadIndex] == -1:
+                        nextDirection[presentRoadIndex] = 2
                     else:
-                        nextCarPriority[provideIndex]= self.prority(self.provider[provideIndex], nextRoad[provideIndex])
+                        nextDirection[presentRoadIndex]= self.direction(self.provider[presentRoadIndex], nextRoad[presentRoadIndex])
                 else:
-                    nextCar[provideIndex] = -1
-                    nextRoad[provideIndex]= -1
-                    nextCarPriority[provideIndex] = -1
+                    nextCar[presentRoadIndex] = -1
+                    nextRoad[presentRoadIndex]= -1
+                    nextDirection[presentRoadIndex] = -1
         done = True
-        for provideIndex in range(self.provider.__len__()):
-            if nextCar[provideIndex] != -1:
+        for fromA in range(self.provider.__len__()):
+            if nextCar[fromA] != -1:
                 done = False
         self.done = done
     def outOfCarport(self):
@@ -460,8 +467,24 @@ class CROSS(object):
     #
     # other functions
     #
-    def prority(self,providerId,receiverId):
-        return self.priorityMap[providerId][receiverId]
+    def isConflict(self,fromA,directionA,fromB,directionB):
+        # -1,0,1,2,3,4,5 => guard_w,n,e,s,w,guard_n,guard_e
+        # -1 ,1, 2 => right left, straight
+        # reason why:
+        # direction:-1,1,2
+        # 0-1=-1=>3=>west,0+1=1=>east,0+2=>2=>south
+        # 1-1=0=>north,1+2=2=>south,1+2=3=>west
+        # and so...
+        #       0
+        #   3       1
+        #       2
+        #
+        if (fromA + directionA)%4 == (fromB + directionB)%4 and directionA < directionB:
+            return True
+        else:
+            return False
+    def direction(self,providerId,receiverId):
+        return self.directionMap[providerId][receiverId]
     def setDone(self,bool):
         self.done = bool
     def setLoc(self,x,y):
@@ -492,12 +515,12 @@ class CROSS(object):
         return self.id_
     def __roadIds__(self):
         return self.roadIds
-    def __providerIndex__(self):
-        return self.providerIndex
-    def __receiverIndex__(self):
-        return self.receiverIndex
-    def __validRoadIndex__(self):
-        return self.validRoadIndex
+    def __providerDirection__(self):
+        return self.providerDirection
+    def __receiverDirection__(self):
+        return self.receiverDirection
+    def __validRoadDirection__(self):
+        return self.validRoadDirection
     def __provider__(self):
         return self.provider
     def __receiver__(self):
@@ -552,11 +575,13 @@ class simulation(object):
                 if not cross.__done__():
                     nextCross.append(crossId)
                 if cross.__update__() or cross.__done__():
+                    if TIME[0] == 55:
+                        print(crossId,cross.__update__(),cross.__done__())
                     self.dead = False
             unfinishedCross = nextCross
-            if self.dead:
-                print("dead lock in", unfinishedCross)
-                return
+            if TIME[0]==55:
+                print(unfinishedCross)
+            assert self.dead is False, print("dead lock in", unfinishedCross)
         print("car pulling away from carport")
         for i in range(CROSSNAMESPACE.__len__()):
             crossId = CROSSNAMESPACE[i]
@@ -737,7 +762,8 @@ class visualization(object):
         cv.putText(img, "in the carport:%d,on the road:%d,end of the trip:%d" % (CARDISTRIBUTION[0],CARDISTRIBUTION[1],CARDISTRIBUTION[2]),(30,30), \
                    cv.FONT_HERSHEY_SIMPLEX, 0.6, [0, 0, 255], 2)
 
-
+def takeSecond(elem):
+    return elem[1]
 
 
 def main():
@@ -773,6 +799,7 @@ def main():
         CROSSDICT[int(id_)] = CROSS(int(id_), int(north_), int(east_), int(south_), int(west_))
     # car route initialize
     # line = (id,startTime,route)
+    count = 0
     for i,line in enumerate(answerInfo):
         if line.strip() =='':
             break
@@ -781,6 +808,8 @@ def main():
         planTime_ = int(line[1])
         route = [int(roadId) for roadId in  line[2:]]
         CARDICT[carId].simulateInit(planTime_,route)
+        count+=1
+    print("There are %d cars' route preinstalled"%count)
     CARDISTRIBUTION[0] = CARNAMESPACE.__len__()
     # **** cross initialization ****#
     for carId in CARNAMESPACE:
@@ -800,3 +829,4 @@ if __name__  ==   "__main__":
 
 
 # python simulator.py ../config_11/car.txt ../config_11/road.txt ../config_11/cross.txt ../config_11/answer.txt
+# python simulator.py ../config_12/car.txt ../config_12/road.txt ../config_12/cross.txt ../config_12/answer.txt
