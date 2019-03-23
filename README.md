@@ -7,8 +7,8 @@
 #**** 更新 ****#    
 
 2019/3/23   
-貌似 simulator1 更接近线上
 并没有更新，只是把之前版本的simulator也放上来。    
+貌似 simulator1 更接近线上
 simulator0 对应 3/20版本         
 simulator1 对应 3/21版本     
 simulator2 对应 3/22版本    
