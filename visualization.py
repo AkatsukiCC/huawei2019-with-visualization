@@ -233,7 +233,7 @@ class visualization(object):
         # draw cross
         for crossId in CROSSNAMESPACE:
             self.plotCross(crossId,img)
-        cv.imwrite(self.savePath+'/000%d.jpg'%TIME[0],img)
+        cv.imwrite(self.savePath+'/%05d.jpg'%TIME[0],img)
     def plotCross(self,crossId,img):
         x, y = CROSSDICT[crossId].__mapLoc__()
         cv.circle(img,(x,y),self.crossRadius,color=self.crossColor,thickness=-1,lineType=-1)
