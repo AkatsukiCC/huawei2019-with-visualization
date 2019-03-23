@@ -30,8 +30,12 @@ time：11 [10010,10004,10005,10006,10007]
 
 
 #**** 关于代码实现常见问题 ****#       
-（1）road中的bucket 是什么？
-    bucket只是一个代号
+（1）road中的bucket是什么，forwardBucket，backwardBucket，provideBucket，receiveBucket又是什么？
+    bucket只是一个代号，在道路设计时，道路通常有两个方向的车道，在代码中定义为forward与backward。道路按长度与channel可以看作一个固定大小的矩阵，以矩阵的形式存储车辆的id,如fig1所示。按照道路的from cross和 to cross定义了forward与backward两个矩阵，分别称为forwardBucket与backwardBucket。上述两bucket因为是由道路决定，在初始化时就固定下来，因此称为绝对桶。下述provideBucket与receiveBucket对应的就称之为相对桶。相对桶是在面对cross调度road时使用，对于不同的cross而言，forwardBucket可能是cross的出车道，也可能是进车道。调度时需要明确调度哪些道路是进车道，哪些是出车道，因此需要用相对桶指明。相对桶实现上是指针，它根据给定的路口会明确的指出哪些是出车道（provideBuket），哪些是入车道（receiveBucket），fig2为相应例子。
+   	 	[][][][][10002][]           	provide	[][][][][][] receive
+    		[][][][][][10050]	       *crossA*	------------ *crossB*
+    		[][][10005][][][]           	receive	[][][][][][] provide
+    		 fig1					fig2
 
 
 
