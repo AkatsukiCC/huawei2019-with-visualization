@@ -161,6 +161,8 @@ class visualization(object):
     def __init__(self):
         self.maxX,self.maxY = 0,0
         self.savePath = './simulatePictures'
+        if not os.path.exists(self.savePath):
+            os.makdir(self.savePath)
         # ** cross param **#
         self.crossRadius = 14
         self.crossDistance = 150
@@ -231,7 +233,7 @@ class visualization(object):
         # draw cross
         for crossId in CROSSNAMESPACE:
             self.plotCross(crossId,img)
-        cv.imwrite(self.savePath+'/%d.jpg'%TIME[0],img)
+        cv.imwrite(self.savePath+'/000%d.jpg'%TIME[0],img)
     def plotCross(self,crossId,img):
         x, y = CROSSDICT[crossId].__mapLoc__()
         cv.circle(img,(x,y),self.crossRadius,color=self.crossColor,thickness=-1,lineType=-1)
