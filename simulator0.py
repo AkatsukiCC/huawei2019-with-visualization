@@ -18,7 +18,7 @@ ROUTEMAP ={}
 class CAR(object):
     def __init__(self,id_,from_,to_,speed_,planTime_):
         # **** statistic parameters ****#
-        self.id_, self.from_, self.to_, self.speed_, self.planTime_ = id_, from_, to_, speed_, planTime_
+        self.id_, self.from_, self.to_, self.speed_, self.planTime_ = id_, from_, to_, speed_, -1
         self.carColor = [int(value) for value in np.random.random_integers(0, 255, [3])]
         # **** dynamic parameters ****#
         self.state,self.x,self.y = 0,0,0
