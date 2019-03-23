@@ -392,7 +392,7 @@ class CROSS(object):
                 nextDirection.append(-1)
         # loop
         for presentRoadIndex in range(self.provider.__len__()):
-            conflict = True
+            conflict = False
             while nextCar[presentRoadIndex]!=-1:
                 # same next road and high priority lead to conflict
                 provider = ROADDICT[self.provider[presentRoadIndex]]
