@@ -450,8 +450,7 @@ class CROSS(object):
                 print("Car(%d).Road(%d) not in cross(%d).function:class.outOfCarport"%(carId,roadId,self.id_))
             act = road.receiveCar(carId)
             if act!=0:
-                self.left=self.readyCars[i:]
-                break
+                self.left.append(self.readCars[i])
             #assert act==0, print("Time(%d),Cross(%d),Road(%d),Car(%d) can't pull away from carport"%(TIME[0],self.id_,roadId,carId))
             self.carportCarNum -= 1
             CARDISTRIBUTION[0] -= 1
