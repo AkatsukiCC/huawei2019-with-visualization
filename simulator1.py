@@ -457,10 +457,10 @@ class CROSS(object):
             act = road.receiveCar(carId)
             if act!=0:
                 self.left.append(self.readyCars[i])
-            #assert act==0, print("Time(%d),Cross(%d),Road(%d),Car(%d) can't pull away from carport"%(TIME[0],self.id_,roadId,carId))
-            self.carportCarNum -= 1
-            CARDISTRIBUTION[0] -= 1
-            CARDISTRIBUTION[1] += 1
+            else:
+                self.carportCarNum -= 1
+                CARDISTRIBUTION[0] -= 1
+                CARDISTRIBUTION[1] += 1
     #
     # other functions
     #
