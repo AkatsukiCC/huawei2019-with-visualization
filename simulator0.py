@@ -402,6 +402,7 @@ class CROSS(object):
                         break
                 #
                 if nextRoad[provideIndex] == -1:
+                    nextCar[provideIndex].updateDynamic(3)
                     provider.firstPriorityCarAct(0)
                     self.update = True
                     CARDISTRIBUTION[1]-=1
