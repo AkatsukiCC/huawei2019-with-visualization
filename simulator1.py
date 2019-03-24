@@ -406,6 +406,7 @@ class CROSS(object):
                 if conflict:
                     break
                 if nextRoad[presentRoadIndex] == -1:
+                    nextCar[presentRoadIndex].updateDynamic(3)
                     provider.firstPriorityCarAct(0)
                     CARDISTRIBUTION[1] -= 1
                     CARDISTRIBUTION[2] += 1
