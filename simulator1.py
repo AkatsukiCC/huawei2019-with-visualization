@@ -360,6 +360,7 @@ class CROSS(object):
         self.provider = [self.provider[i][1] for i in range(self.provider.__len__())]
         # **** dynamic parameters ****#
         self.readyCars = []
+        self.left = []
         self.carportCarNum = 0
         self.finishCarNum = 0
         # **** flag ****#
