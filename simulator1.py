@@ -440,7 +440,7 @@ class CROSS(object):
                 done = False
         self.done = done
     def outOfCarport(self):
-        self.readyCars = self.left
+        self.readyCars = self.leftCars
         self.leftCars=[]
         if TIME[0] in self.carport.keys():
             self.carport[TIME[0]].sort()
