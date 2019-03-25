@@ -440,7 +440,7 @@ class CROSS(object):
             self.readyCars.extend(self.carport[TIME[0]])
         if self.readyCars.__len__() == 0:
             return
-        #self.readyCars.sort()
+        self.readyCars.sort()
         for roadId in self.receiver:
             ROADDICT[roadId].setBucket(self.id_)
         for i in range(self.readyCars.__len__()):
