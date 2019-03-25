@@ -13,7 +13,7 @@
 2019/3/24    
 （感谢狗森蛋的反馈）     
 更新了一个车库车辆出车的bug，原代码会在升序遇到第一辆车无法出车时会将后续大id的车一并判断为无法出车。以做出修改。     
-(代码位置ctrl+f self.left.append(self.readyCars[i]))
+(代码位置ctrl+f self.leftCars.append(self.readyCars[i]))
 
 
 2019/3/23  
