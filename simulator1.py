@@ -360,7 +360,7 @@ class CROSS(object):
         self.provider = [self.provider[i][1] for i in range(self.provider.__len__())]
         # **** dynamic parameters ****#
         self.readyCars = []
-        self.left = []
+        self.leftCars = []
         self.carportCarNum = 0
         self.finishCarNum = 0
         # **** flag ****#
@@ -441,7 +441,7 @@ class CROSS(object):
         self.done = done
     def outOfCarport(self):
         self.readyCars = self.left
-        self.left=[]
+        self.leftCars=[]
         if TIME[0] in self.carport.keys():
             self.carport[TIME[0]].sort()
             self.readyCars.extend(self.carport[TIME[0]])
@@ -458,7 +458,7 @@ class CROSS(object):
                 print("Car(%d).Road(%d) not in cross(%d).function:class.outOfCarport"%(carId,roadId,self.id_))
             act = road.receiveCar(carId)
             if act!=0:
-                self.left.append(self.readyCars[i])
+                self.leftCars.append(self.readyCars[i])
             else:
                 self.carportCarNum -= 1
                 CARDISTRIBUTION[0] -= 1
