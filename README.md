@@ -72,12 +72,13 @@ while allCarDone == False:
 			firstPriorityCars = []    
 			for road in crossRoad:    
 				firstPriorityCars.append(road.getFirstPriorityCar())    
-			for road in crossRoad(升序，仅考虑在当前cross下作为出口的road):   
-				car = road.getFirstPriorityCar()(仅为可能出道路的车)    
-				if conflict(road,car,firstPriorityCars):    
-					break  
-				car.run()  
-				road.run(car.channel)（一旦car到达完毕状态，road中car所在车道做一次”道内移动“）  	    
+			for road in crossRoad(升序，仅考虑在当前cross下作为出口的road):
+				while:
+					car = road.getFirstPriorityCar()(仅为可能出道路的车)    
+					if conflict(road,car,firstPriorityCars):    
+						break  
+					car.run()  
+					road.run(car.channel)（一旦car到达完毕状态，road中car所在车道做一次”道内移动“）  	    
 	time+=1  
 
 
