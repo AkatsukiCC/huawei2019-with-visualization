@@ -647,7 +647,7 @@ class visualization(object):
     # draw functions
     #
     def drawMap(self):
-        img = np.ones((self.maxX,self.maxY,3),np.uint8)*255
+        img = np.ones((self.maxY,self.maxX,3),np.uint8)*255
         #draw road
         for roadId in ROADNAMESPACE:
             self.plotRoad(roadId,img)
@@ -772,10 +772,38 @@ def main():
                                   int(isDuplex_))
     # create cross objects
     # line = (id,north,east,south,west)
+        visitDone = {}
     for line in crossInfo:
         id_, north_, east_, south_, west_ = line.replace(' ', '').replace('\t', '')[1:-1].split(',')
         CROSSNAMESPACE.append(int(id_))
-        CROSSDICT[int(id_)] = CROSS(int(id_), int(north_), int(east_), int(south_), int(west_))
+        visitDone[int(id_)] = False
+        CROSSDICT[int(id_)] = [int(north_), int(east_), int(south_), int(west_)]
+
+    #DP and DFS adjust directions
+    def DFS(crossId,direction=None,preCrossId=None):
+        if visitDone[crossId]:
+            return
+        visitDone[crossId] = True
+        if preCrossId is not None:
+            for i in range(4):
+                roadId = CROSSDICT[crossId][i]
+                if roadId!=-1:
+                    pcId = ROADDICT[roadId].__from__() if ROADDICT[roadId].__from__()!= crossId else ROADDICT[roadId].__to__()
+                    if pcId == preCrossId:
+                        break
+            shift=((i+2)%4-direction)%4
+            for i in range(shift):
+                CROSSDICT[crossId]=[CROSSDICT[crossId][1],CROSSDICT[crossId][2],CROSSDICT[crossId][3],CROSSDICT[crossId][0]]
+        for i in range(4):
+            roadId = CROSSDICT[crossId][i]
+            if roadId!=-1:
+                nextCrossId = ROADDICT[roadId].__from__() if ROADDICT[roadId].__from__()!= crossId else ROADDICT[roadId].__to__()
+                DFS(nextCrossId,i,crossId)
+
+    DFS(CROSSNAMESPACE[0])
+    for crossId in CROSSNAMESPACE:
+        north_,east_,south_,west_ = CROSSDICT[crossId]
+        CROSSDICT[crossId] = CROSS(crossId,north_,east_,south_,west_)
     # car route initialize
     # line = (id,startTime,route)
     count = 0
