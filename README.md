@@ -9,6 +9,60 @@ img = np.ones((self.maxX,self.maxY,3),np.unit8)*255
 改为
 img = np.ones((self.maxY,self.maxX,3),np.unit8)*255
 
+ 
+没想到华为真的这样做了（山人自有妙计）......                                                  
+原代码          
+for line in crossInfo:
+    id_, north_, east_, south_, west_ = line.replace(' ', '').replace('\t', '')[1:-1].split(',')
+    CROSSNAMESPACE.append(int(id_))
+    CROSSDICT[int(id_)] = [int(north_), int(east_), int(south_), int(west_)]
+                  
+更改为                                   
+visitDone = {}
+for line in crossInfo:
+    id_, north_, east_, south_, west_ = line.replace(' ', '').replace('\t', '')[1:-1].split(',')
+    CROSSNAMESPACE.append(int(id_))
+    visitDone[int(id_)] = False
+    CROSSDICT[int(id_)] = [int(north_), int(east_), int(south_), int(west_)]
+
+#DP and DFS adjust directions
+def DFS(crossId,direction=None,preCrossId=None):
+    if visitDone[crossId]:
+        return
+    visitDone[crossId] = True
+    if preCrossId is not None:
+        for i in range(4):
+            roadId = CROSSDICT[crossId][i]
+            if roadId!=-1:
+                pcId = ROADDICT[roadId].__from__() if ROADDICT[roadId].__from__()!= crossId else ROADDICT[roadId].__to__()
+                if pcId == preCrossId:
+                    break
+        shift=((i+2)%4-direction)%4
+        for i in range(shift):
+            CROSSDICT[crossId]=[CROSSDICT[crossId][1],CROSSDICT[crossId][2],CROSSDICT[crossId][3],CROSSDICT[crossId][0]]
+    for i in range(4):
+        roadId = CROSSDICT[crossId][i]
+        if roadId!=-1:
+            nextCrossId = ROADDICT[roadId].__from__() if ROADDICT[roadId].__from__()!= crossId else ROADDICT[roadId].__to__()
+            DFS(nextCrossId,i,crossId)
+
+DFS(CROSSNAMESPACE[0])
+for crossId in CROSSNAMESPACE:
+    north_,east_,south_,west_ = CROSSDICT[crossId]
+    CROSSDICT[crossId] = CROSS(crossId,north_,east_,south_,west_)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
