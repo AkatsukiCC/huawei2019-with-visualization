@@ -10,14 +10,15 @@ img = np.ones((self.maxX,self.maxY,3),np.unit8)*255
 img = np.ones((self.maxY,self.maxX,3),np.unit8)*255
 
  
-没想到华为真的这样做了（山人自有妙计）......                                                  
-原代码          
+没想到华为官方真修改了cross.txt（山人自有妙计）......                                                  
+原代码             
 for line in crossInfo:
     id_, north_, east_, south_, west_ = line.replace(' ', '').replace('\t', '')[1:-1].split(',')
     CROSSNAMESPACE.append(int(id_))
     CROSSDICT[int(id_)] = [int(north_), int(east_), int(south_), int(west_)]
                   
-更改为                                   
+更改为      
+原理 利用 cross与road的连接关系 以及顺时针关系 利用DFS计算出所有道路的相对位置                            
 visitDone = {}
 for line in crossInfo:
     id_, north_, east_, south_, west_ = line.replace(' ', '').replace('\t', '')[1:-1].split(',')
